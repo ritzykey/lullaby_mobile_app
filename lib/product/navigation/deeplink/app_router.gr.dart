@@ -200,6 +200,25 @@ class LoginRoute extends PageRouteInfo<void> {
 }
 
 /// generated route for
+/// [LullabiesDownloadedListView]
+class LullabiesDownloadedListRoute extends PageRouteInfo<void> {
+  const LullabiesDownloadedListRoute({List<PageRouteInfo>? children})
+      : super(
+          LullabiesDownloadedListRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'LullabiesDownloadedListRoute';
+
+  static PageInfo page = PageInfo(
+    name,
+    builder: (data) {
+      return const LullabiesDownloadedListView();
+    },
+  );
+}
+
+/// generated route for
 /// [LullabiesListView]
 class LullabiesListRoute extends PageRouteInfo<LullabiesListRouteArgs> {
   LullabiesListRoute({

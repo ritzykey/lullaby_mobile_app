@@ -1,4 +1,5 @@
 import 'package:auto_route/auto_route.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:kartal/kartal.dart';
@@ -11,6 +12,11 @@ import 'package:x_im_v00r01/product/navigation/deeplink/my_route_observer.dart';
 class NavigationView extends StatelessWidget {
   const NavigationView({super.key});
 
+  Future<bool> hasInternetConnection() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+    return !connectivityResult.contains(ConnectivityResult.none);
+  }
+
   @override
   Widget build(BuildContext context) {
     final myRouteObserver = MyRouteObserver();
@@ -18,7 +24,7 @@ class NavigationView extends StatelessWidget {
       navigatorObservers: () => [myRouteObserver],
       routes: const [
         LullabyHomeRoute(),
-        DiscoverRoute(),
+        LullabiesDownloadedListRoute(),
         OnboardingsRoute(),
         FavoritesRoute(),
         SettingsRoute(),
@@ -32,7 +38,15 @@ class NavigationView extends StatelessWidget {
               SalomonBottomBar(
                 key: ValueKey(context.locale),
                 currentIndex: tabsRouter.activeIndex,
-                onTap: (index) {
+                onTap: (index) async {
+                  final hasInternet = await hasInternetConnection();
+                  if (!hasInternet && index != 1) {
+                    // İnternet yoksa ve seçilen sekme "Downloaded" değilse engelle
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('İnternet bağlantısı yok')),
+                    );
+                    return;
+                  }
                   // here we switch between tabs
                   tabsRouter.setActiveIndex(index);
                 },

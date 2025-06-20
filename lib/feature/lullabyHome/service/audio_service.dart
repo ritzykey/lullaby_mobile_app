@@ -1,6 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:vexana/vexana.dart';
 
 class AudioService {
   AudioService() {
@@ -9,6 +12,7 @@ class AudioService {
     });
   }
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final Dio _dio = Dio();
 
   /// AudioPlayer instance getter (optional)
   AudioPlayer get instance => _audioPlayer;
@@ -25,24 +29,75 @@ class AudioService {
     }
   }
 
-  /// Play an audio file from a URL or local path
+  /// Play audio from URL or local path
   Future<void> play(String url) async {
     try {
-      // Aynı URL tekrar oynatılacaksa, yeniden başlat
+      if (url.isEmpty) return;
+
+      // Aynı ses tekrar çalınıyorsa ve daha önce tamamlanmışsa yeniden başlat
       if (_isCompleted || _audioPlayer.state == PlayerState.completed) {
-        await _audioPlayer.play(UrlSource(_lastUrl!));
+        if (_lastUrl != null) {
+          if (_isLocalPath(_lastUrl!)) {
+            await _audioPlayer.play(DeviceFileSource(_lastUrl!));
+          } else {
+            await _audioPlayer.play(UrlSource(_lastUrl!));
+          }
+        }
         _isCompleted = false;
+        return;
       }
 
+      // Zaten oynatılıyorsa tekrar başlatma
       if (_audioPlayer.state == PlayerState.playing && _lastUrl == url) {
         log('Already playing.');
         return;
       }
 
       _lastUrl = url;
-      await _audioPlayer.play(UrlSource(url));
+
+      // Local dosya mı kontrol et
+      if (_isLocalPath(url)) {
+        await _audioPlayer.play(DeviceFileSource(url));
+      } else {
+        await _audioPlayer.play(UrlSource(url));
+      }
     } catch (e, stack) {
       log('Error while playing audio: $e', stackTrace: stack);
+    }
+  }
+
+  /// Dosya yolunun local olup olmadığını kontrol eder
+  bool _isLocalPath(String path) {
+    return path.startsWith('/') ||
+        path.startsWith('file://') ||
+        File(path).existsSync();
+  }
+
+  /// Dosyayı indirip local path döner
+  Future<String?> downloadAudio(String? url, String? fileName) async {
+    try {
+      /* if (Platform.isAndroid) {
+        final status = await Permission.storage.request();
+        if (!status.isGranted) return null;
+      } */
+      if (url == null) {
+        return '';
+      }
+
+      final dir = await getApplicationDocumentsDirectory();
+      final filePath = '${dir.path}/$fileName';
+
+      final file = File(filePath);
+
+      if (!await file.exists()) {
+        final response = await _dio.download(url, filePath);
+        if (response.statusCode != 200) return null;
+      }
+
+      return filePath;
+    } catch (e) {
+      print('Download error: $e');
+      return null;
     }
   }
 

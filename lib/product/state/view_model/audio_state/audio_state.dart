@@ -9,6 +9,7 @@ final class AudioState extends Equatable {
     required this.position,
     required this.lullaby,
     required this.lullabyFavs,
+    this.downloadedLullabyIds = const [],
   });
 
   final bool? isLoading;
@@ -18,10 +19,18 @@ final class AudioState extends Equatable {
 
   final List<LulbyModel> lullaby;
   final List<LulbyModel>? lullabyFavs;
+  final List<String> downloadedLullabyIds;
 
   @override
-  List<Object?> get props =>
-      [isLoading, isPlaying, duration, position, lullaby, lullabyFavs];
+  List<Object?> get props => [
+        isLoading,
+        isPlaying,
+        duration,
+        position,
+        lullaby,
+        lullabyFavs,
+        downloadedLullabyIds,
+      ];
 
   AudioState copyWith({
     bool? isLoading,
@@ -29,7 +38,8 @@ final class AudioState extends Equatable {
     Duration? duration,
     Duration? position,
     List<LulbyModel>? lullaby,
-    List<LulbyModel>? lullabyFavs
+    List<LulbyModel>? lullabyFavs,
+    List<String>? downloadedLullabyIds,
   }) {
     return AudioState(
       isLoading: isLoading ?? this.isLoading,
@@ -37,7 +47,8 @@ final class AudioState extends Equatable {
       duration: duration ?? this.duration,
       position: position ?? this.position,
       lullaby: lullaby ?? this.lullaby,
-      lullabyFavs: lullabyFavs ?? this.lullabyFavs
+      lullabyFavs: lullabyFavs ?? this.lullabyFavs,
+      downloadedLullabyIds: downloadedLullabyIds ?? this.downloadedLullabyIds,
     );
   }
 }

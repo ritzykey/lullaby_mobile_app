@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kartal/kartal.dart';
 import 'package:x_im_v00r01/feature/lullabiesList/view/mixin/lullabiesList_view_mixin.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/model/lulby_model.dart';
+import 'package:x_im_v00r01/product/cache/model/lullaby_cache_model%20copy.dart';
 import 'package:x_im_v00r01/product/cache/model/user_cache_model.dart';
 import 'package:x_im_v00r01/product/state/base/base_state.dart';
 import 'package:x_im_v00r01/product/state/view_model/audio_state/audio_state.dart';
@@ -27,6 +28,30 @@ class LullabiesListView extends StatefulWidget {
 
 class _LullabiesListViewState extends BaseState<LullabiesListView>
     with LullabiesListViewMixin {
+  void onPressedFavButton(
+    List<String> state,
+    bool isFavorite,
+    LulbyModel lullaby,
+  ) {
+    final updatedFavorites = [
+      ...state,
+    ];
+    if (isFavorite) {
+      updatedFavorites.remove(lullaby.id);
+    } else {
+      updatedFavorites.add(lullaby.id);
+    }
+
+    lullabiesListViewModel.userCacheOperation.put(
+      'favorites',
+      UserCacheModel(
+        favorites: updatedFavorites,
+      ),
+    );
+
+    changeFavList(updatedFavorites);
+  }
+
   @override
   Widget build(BuildContext context) {
     print(widget.path);
@@ -157,63 +182,88 @@ class _LullabiesListViewState extends BaseState<LullabiesListView>
                                     style:
                                         context.general.textTheme.titleMedium,
                                   ),
-                                  trailing: BlocSelector<AudioViewModel,
-                                      AudioState, List<String>>(
-                                    selector: (state) {
-                                      return state.lullabyFavs!
-                                          .map((e) => e.id)
-                                          .toList();
-                                    },
-                                    builder: (context, state) {
-                                      final isFavorite =
-                                          state.contains(lullaby.id);
-                                      return Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IconButton(
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Favori butonu
+                                      BlocSelector<AudioViewModel, AudioState,
+                                          List<String>>(
+                                        selector: (state) {
+                                          return state.lullabyFavs!
+                                              .map((e) => e.id)
+                                              .toList();
+                                        },
+                                        builder: (context, state) {
+                                          final isFavorite =
+                                              state.contains(lullaby.id);
+                                          return IconButton(
                                             icon: Icon(
                                               isFavorite
                                                   ? Icons.favorite
                                                   : Icons.favorite_border,
                                               color: Colors.red,
                                             ),
+                                            tooltip: isFavorite
+                                                ? 'Favorilerden çıkar'
+                                                : 'Favorilere ekle',
                                             onPressed: () {
-                                              // Favori durumunu değiştir
-                                              /* setState(() {
-                                                                                lullaby.isFavorite =
-                                                                                    !(lullaby.isFavorite ?? false);
-                                                                              }); */
-
-                                              // Favoriye ekleme/çıkarma işlemi burada yapılabilir
-                                              // örnek:
-
-                                              final updatedFavorites = [
-                                                ...state,
-                                              ];
-                                              if (isFavorite) {
-                                                updatedFavorites
-                                                    .remove(lullaby.id);
-                                              } else {
-                                                updatedFavorites
-                                                    .add(lullaby.id);
-                                              }
-
-                                              lullabiesListViewModel
-                                                  .userCacheOperation
-                                                  .put(
-                                                'favorites',
-                                                UserCacheModel(
-                                                  favorites: updatedFavorites,
-                                                ),
+                                              onPressedFavButton(
+                                                state,
+                                                isFavorite,
+                                                lullaby,
                                               );
-
-                                              changeFavList(updatedFavorites);
                                             },
-                                          ),
-                                          const Icon(Icons.arrow_forward_ios),
-                                        ],
-                                      );
-                                    },
+                                          );
+                                        },
+                                      ),
+
+                                      // İndirme butonu
+                                      BlocSelector<AudioViewModel, AudioState,
+                                          List<String>>(
+                                        selector: (state) {
+                                          return state.downloadedLullabyIds;
+                                        },
+                                        builder: (context, state) {
+                                          final isDownloaded =
+                                              state.contains(lullaby.id);
+                                          return IconButton(
+                                            icon: Icon(
+                                              isDownloaded
+                                                  ? Icons.download_done
+                                                  : Icons.download,
+                                            ),
+                                            tooltip: isDownloaded
+                                                ? 'İndirildi'
+                                                : 'İndir',
+                                            onPressed: () async {
+                                              final success = await audioViewModel
+                                                  .downloadLullaby(
+                                                      item: LullabyCacheModel(
+                                                          lullabyId: lullaby.id,
+                                                          title: lullaby.title,
+                                                          audioUrl: lullaby
+                                                              .audioURL));
+
+                                              if (context.mounted) {
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                      success
+                                                          ? 'İndirme tamamlandı'
+                                                          : 'İndirme başarısız oldu',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      ),
+
+                                      // Yönlendirme oku
+                                      const Icon(Icons.arrow_forward_ios),
+                                    ],
                                   ),
                                   onTap: () {
                                     audioViewModel.changeLullaby([
@@ -222,6 +272,7 @@ class _LullabiesListViewState extends BaseState<LullabiesListView>
                                         title: lullaby.title,
                                         audioURL: lullaby.audioURL,
                                         artist: lullaby.artist,
+                                        coverURL: lullaby.coverURL,
                                       ),
                                     ]);
                                     audioService.play(

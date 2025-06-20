@@ -38,11 +38,23 @@ class _MiniAudioPlayerState extends BaseState<MiniAudioPlayer>
                 // Albüm görseli
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    'https://mutluyasam.com.tr/wp-content/uploads/2022/01/ozguvenli-cocuklar-yetistirmek.jpg',
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
+                  child: BlocSelector<AudioViewModel, AudioState, String>(
+                    selector: (state) {
+                      if (state.lullaby.isNotEmpty &&
+                          state.lullaby.first.coverURL != null &&
+                          state.lullaby.first.coverURL!.isNotEmpty) {
+                        return state.lullaby.first.coverURL!;
+                      }
+                      return 'https://mutluyasam.com.tr/wp-content/uploads/2022/01/ozguvenli-cocuklar-yetistirmek.jpg';
+                    },
+                    builder: (context, imageUrl) {
+                      return Image.network(
+                        imageUrl,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      );
+                    },
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -169,20 +181,28 @@ class _MiniAudioPlayerState extends BaseState<MiniAudioPlayer>
                 ),
 
                 // Oynatma Düğmesi
-                IconButton(
-                  icon: Icon(
-                    context.watch<AudioViewModel>().state.isPlaying
-                        ? Icons.pause
-                        : Icons.play_arrow,
-                    color: Colors.white,
-                  ),
-                  onPressed: () async {
-                    // Oynat/duraklat fonksiyonu
-                    context.read<AudioViewModel>().state.isPlaying
-                        ? await audioService.pause()
-                        : await audioService.play(
-                            'https://fgtupdhhjcmdoqfrerxj.supabase.co/storage/v1/object/public/lullabies//AtemTutemMen.mp3',
-                          );
+                BlocSelector<AudioViewModel, AudioState, bool>(
+                  selector: (state) => state.isPlaying,
+                  builder: (context, isPlaying) {
+                    return IconButton(
+                      icon: Icon(
+                        isPlaying ? Icons.pause : Icons.play_arrow,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        final viewModel = context.read<AudioViewModel>();
+                        final currentLullaby = viewModel.state.lullaby.first;
+
+                        if (isPlaying) {
+                          await audioService.pause();
+                        } else {
+                          await audioService.play(currentLullaby.audioURL);
+                        }
+
+                        // Cubit güncellemesi unutulmasın!
+                        viewModel.changeIsPlaying(!isPlaying);
+                      },
+                    );
                   },
                 ),
               ],

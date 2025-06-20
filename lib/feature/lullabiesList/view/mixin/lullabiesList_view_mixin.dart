@@ -71,6 +71,18 @@ mixin LullabiesListViewMixin on BaseState<LullabiesListView> {
           )
           .toList();
       audioViewModel.changeLullabyFavs(favLullaby);
+
+      final downloadedeLullabies =
+          ProductStateItems.productCache.lullabyCacheOperation
+              .getAll()
+              .map(
+                (e) => e.id ?? '',
+              )
+              .toList();
+
+      audioViewModel.changeDownloadedLullabyIds(
+        downloadedeLullabies,
+      );
       return;
     }
 

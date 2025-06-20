@@ -8,6 +8,7 @@ import 'package:x_im_v00r01/feature/home/view/home_view.dart';
 import 'package:x_im_v00r01/feature/homenew/view/homenew_view.dart';
 import 'package:x_im_v00r01/feature/loading/view/loading_view.dart';
 import 'package:x_im_v00r01/feature/login/view/login_view.dart';
+import 'package:x_im_v00r01/feature/lullabiesDownloadedList/view/lullabiesDownloadedList_view.dart';
 import 'package:x_im_v00r01/feature/lullabiesList/view/lullabiesList_view.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/view/lullabyHomeParent_view.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/view/lullabyHome_view.dart';
@@ -144,7 +145,7 @@ class AppRouter extends RootStackRouter {
               ],
             ),
             CustomRoute<dynamic>(
-              page: DiscoverRoute.page,
+              page: LullabiesDownloadedListRoute.page,
               transitionsBuilder: TransitionsBuilders.fadeIn,
               durationInMilliseconds: 500, // 🔹 Animasyon süresi
               path: 'discover',

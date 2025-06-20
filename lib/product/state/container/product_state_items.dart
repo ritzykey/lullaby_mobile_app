@@ -1,5 +1,4 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:x_im_v00r01/feature/favorites/view_model/favorites_view_model.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/service/audio_service.dart';
 import 'package:x_im_v00r01/product/init/index.dart';
 import 'package:x_im_v00r01/product/service/manager/index.dart';
