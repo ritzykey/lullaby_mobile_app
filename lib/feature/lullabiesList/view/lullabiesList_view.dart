@@ -38,8 +38,21 @@ class _LullabiesListViewState extends BaseState<LullabiesListView>
     ];
     if (isFavorite) {
       updatedFavorites.remove(lullaby.id);
+      lullabiesListViewModel.userCacheOperation.remove(lullaby.id);
     } else {
       updatedFavorites.add(lullaby.id);
+      lullabiesListViewModel.userCacheOperation.add(
+        UserCacheModel(
+          lullabyCache: LullabyCacheModel(
+            lullabyId: lullaby.id,
+            title: lullaby.title,
+            audioUrl: lullaby.audioURL,
+            artist: lullaby.artist,
+            coverURL: lullaby.coverURL,
+            isFavorite: true,
+          ),
+        ),
+      );
     }
 
     lullabiesListViewModel.userCacheOperation.put(
@@ -219,13 +232,16 @@ class _LullabiesListViewState extends BaseState<LullabiesListView>
 
                                       // İndirme butonu
                                       BlocSelector<AudioViewModel, AudioState,
-                                          List<String>>(
+                                          List<LullabyCacheModel>>(
                                         selector: (state) {
                                           return state.downloadedLullabyIds;
                                         },
                                         builder: (context, state) {
-                                          final isDownloaded =
-                                              state.contains(lullaby.id);
+                                          final isDownloaded = state
+                                              .map(
+                                                (e) => e.lullabyId,
+                                              )
+                                              .contains(lullaby.id);
                                           return IconButton(
                                             icon: Icon(
                                               isDownloaded
@@ -236,13 +252,18 @@ class _LullabiesListViewState extends BaseState<LullabiesListView>
                                                 ? 'İndirildi'
                                                 : 'İndir',
                                             onPressed: () async {
-                                              final success = await audioViewModel
-                                                  .downloadLullaby(
-                                                      item: LullabyCacheModel(
-                                                          lullabyId: lullaby.id,
-                                                          title: lullaby.title,
-                                                          audioUrl: lullaby
-                                                              .audioURL));
+                                              final success =
+                                                  await audioViewModel
+                                                      .downloadLullaby(
+                                                item: LullabyCacheModel(
+                                                  lullabyId: lullaby.id,
+                                                  title: lullaby.title,
+                                                  audioUrl: lullaby.audioURL,
+                                                  artist: lullaby.artist,
+                                                  coverURL: lullaby.coverURL,
+                                                  isDownloaded: true,
+                                                ),
+                                              );
 
                                               if (context.mounted) {
                                                 ScaffoldMessenger.of(context)

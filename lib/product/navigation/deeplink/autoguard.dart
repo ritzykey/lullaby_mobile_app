@@ -12,6 +12,7 @@ class FirstTimeGuard extends AutoRouteGuard {
 
   @override
   void onNavigation(NavigationResolver resolver, StackRouter router) {
+    // print(userCacheOperation.getAll());
     var userCache = userCacheOperation.get('isFirstTime');
     final isFirstTime = userCache?.isFirstTime ?? true; // Null kontrolü
     print('isFirstTime: $isFirstTime');

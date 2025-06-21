@@ -36,7 +36,7 @@ final class AplicationInitiliaze {
 
     await _productEnvironmentWithContainer();
 
-    await ProductStateItems.productCache.init();
+    // await ProductStateItems.productCache.init();
 
     FlutterNativeSplash.remove();
 

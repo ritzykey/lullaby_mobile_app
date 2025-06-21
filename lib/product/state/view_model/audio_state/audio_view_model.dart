@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/model/lulby_model.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/service/audio_service.dart';
 import 'package:x_im_v00r01/product/cache/model/lullaby_cache_model%20copy.dart';
+import 'package:x_im_v00r01/product/cache/model/user_cache_model.dart';
 import 'package:x_im_v00r01/product/state/base/base_cubit.dart';
 import 'package:x_im_v00r01/product/state/view_model/audio_state/audio_state.dart';
 
@@ -25,7 +26,7 @@ final class AudioViewModel extends BaseCubit<AudioState> {
           ),
         );
   final AudioService _audioService;
-  final HiveCacheOperation<LullabyCacheModel> _lullabyCacheOperation;
+  final HiveCacheOperation<UserCacheModel> _lullabyCacheOperation;
 
   void changeLoading() {
     emit(state.copyWith(isLoading: state.isLoading));
@@ -51,18 +52,27 @@ final class AudioViewModel extends BaseCubit<AudioState> {
     emit(state.copyWith(lullabyFavs: lullaby));
   }
 
-   void changeDownloadedLullabyIds(List<String> lullaby) {
+  void changeDownloadedLullabyIds(List<LullabyCacheModel> lullaby) {
     emit(state.copyWith(downloadedLullabyIds: lullaby));
   }
 
   Future<bool> downloadLullaby({required LullabyCacheModel item}) async {
     final path =
         await _audioService.downloadAudio(item.audioUrl, item.lullabyId);
-    _lullabyCacheOperation.add(item.copyWith(audioUrl: path));
+
     if (path != null) {
-      final updated = List<String>.from(state.downloadedLullabyIds);
-      if (!updated.contains(item.lullabyId)) {
-        updated.add(item.lullabyId ?? '');
+      _lullabyCacheOperation
+          .add(UserCacheModel(lullabyCache: item.copyWith(audioUrl: path)));
+
+      final updated = List<LullabyCacheModel>.from(state.downloadedLullabyIds);
+      if (!updated
+          .map(
+            (e) => e.lullabyId,
+          )
+          .contains(item.lullabyId)) {
+
+        updated.add(item.copyWith(audioUrl: path));
+
         emit(state.copyWith(downloadedLullabyIds: updated));
       }
       return true;

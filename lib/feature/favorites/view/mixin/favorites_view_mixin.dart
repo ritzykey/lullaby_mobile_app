@@ -64,6 +64,7 @@ mixin FavoritesViewMixin on BaseState<FavoritesView> {
       ...favoriteIds,
     ];
     updatedFavorites.remove(lullabyId);
+    favoritesViewModel.userCacheOperation.remove(lullabyId);
     favoritesViewModel.userCacheOperation.put(
       'favorites',
       UserCacheModel(

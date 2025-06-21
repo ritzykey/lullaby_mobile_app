@@ -28,8 +28,12 @@ final class ProductContainer {
       anonKey: AppEnvironmentItems.anonKey.value,
     );
 
+    final hiveCacheManager = HiveCacheManager();
+    final productCache = ProductCache(cacheManager: hiveCacheManager);
+    await productCache.init();
+
     _getIt
-      ..registerSingleton(ProductCache(cacheManager: HiveCacheManager()))
+      ..registerSingleton<ProductCache>(productCache)
       ..registerSingleton<ProductNetworkManager>(ProductNetworkManager.base())
       ..registerLazySingleton<SupabaseClient>(() => Supabase.instance.client)
       ..registerLazySingleton<ProductViewModel>(
@@ -37,7 +41,7 @@ final class ProductContainer {
       )
       ..registerLazySingleton<AudioViewModel>(
         () => AudioViewModel(ProductStateItems.audioService,
-            ProductStateItems.productCache.lullabyCacheOperation),
+            ProductStateItems.productCache.userCacheOperation),
       )
       ..registerLazySingleton<AudioService>(
         AudioService.new,

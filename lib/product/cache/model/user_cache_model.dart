@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:gen/gen.dart';
 import 'package:kartal/kartal.dart';
+import 'package:x_im_v00r01/product/cache/model/lullaby_cache_model%20copy.dart';
 
 final class UserCacheModel with CacheModel {
   UserCacheModel({
@@ -12,10 +13,12 @@ final class UserCacheModel with CacheModel {
     this.selectedTextSize,
     this.fontSize,
     this.favorites,
+    this.lullabyCache,
   });
 
   UserCacheModel.empty()
       : user = LoginResponseModel2(),
+        lullabyCache = LullabyCacheModel.empty(),
         isFirstTime = true,
         themeMode = null,
         language = null,
@@ -31,6 +34,11 @@ final class UserCacheModel with CacheModel {
   final double? fontSize;
   final List<String>? favorites;
 
+  final LullabyCacheModel? lullabyCache;
+
+  @override
+  String get typeName => 'UserCacheModel'; // sabit string
+
   @override
   UserCacheModel fromDynamicJson(dynamic json) {
     final jsonMap = json as Map<String, dynamic>?;
@@ -39,6 +47,7 @@ final class UserCacheModel with CacheModel {
       return this;
     }
     return copyWith(
+      lullabyCache: LullabyCacheModel.empty().fromDynamicJson(json),
       user: LoginResponseModel2.fromJson(jsonMap),
       isFirstTime: jsonMap['isFirstTime'] as bool?, // isFirstTime'ı al!
       themeMode: _stringToThemeMode(jsonMap['themeMode'] as String?),
@@ -56,12 +65,15 @@ final class UserCacheModel with CacheModel {
   }
 
   @override
-  String get id => user?.user?.id.toString() ?? '';
+  String get id => lullabyCache?.lullabyId ?? 'user_01';
+
+  void get audioUrl {}
 
   @override
   Map<String, dynamic> toJson() {
     return {
       ...(user ?? LoginResponseModel2()).toJson(),
+      ...(lullabyCache ?? LullabyCacheModel.empty()).toJson(),
       'isFirstTime': isFirstTime,
       'themeMode': themeMode.toString().split('.').last,
       'language': language?.languageCode,
@@ -79,8 +91,10 @@ final class UserCacheModel with CacheModel {
     Locale? language,
     List<bool>? selectedTextSize,
     double? fontSize,
+    LullabyCacheModel? lullabyCache,
   }) {
     return UserCacheModel(
+      lullabyCache: lullabyCache ?? this.lullabyCache,
       user: user ?? this.user,
       isFirstTime: isFirstTime ?? this.isFirstTime,
       themeMode: themeMode ?? this.themeMode,

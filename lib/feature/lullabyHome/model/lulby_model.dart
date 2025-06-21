@@ -2,10 +2,10 @@ import 'package:equatable/equatable.dart';
 
 class LulbyModel extends Equatable {
   const LulbyModel({
+    required this.id,
     required this.title,
     required this.audioURL,
     required this.artist,
-    required this.id,
     this.coverURL,
     this.isFavorite = false,
   });

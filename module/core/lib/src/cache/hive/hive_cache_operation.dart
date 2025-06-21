@@ -7,7 +7,8 @@ import 'package:hive/hive.dart';
 class HiveCacheOperation<T extends CacheModel> extends CacheOperation<T> {
   /// Initialize hive box
   HiveCacheOperation() {
-    _box = Hive.box<T>(name: T.toString());
+    final boxName = T.toString();
+    _box = Hive.box<T>(name: boxName);
   }
   late final Box<T> _box;
 

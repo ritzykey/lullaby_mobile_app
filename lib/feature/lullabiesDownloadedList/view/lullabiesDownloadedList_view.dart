@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kartal/kartal.dart';
 import 'package:x_im_v00r01/feature/lullabiesDownloadedList/view/mixin/lullabiesDownloadedList_view_mixin.dart';
-import 'package:x_im_v00r01/feature/lullabiesDownloadedList/view_model/lullabiesDownloadedList_view_model.dart';
-import 'package:x_im_v00r01/feature/lullabiesDownloadedList/view_model/state/lullabiesDownloadedList_state.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/model/lulby_model.dart';
 import 'package:x_im_v00r01/product/state/base/base_state.dart';
+import 'package:x_im_v00r01/product/state/view_model/audio_state/audio_state.dart';
+import 'package:x_im_v00r01/product/state/view_model/audio_state/audio_view_model.dart';
 
 @RoutePage()
 class LullabiesDownloadedListView extends StatefulWidget {
@@ -20,21 +20,15 @@ class LullabiesDownloadedListView extends StatefulWidget {
 class _FavoritesViewState extends BaseState<LullabiesDownloadedListView>
     with LullabiesDownloadedListViewMixin {
   @override
-  void initState() {
-    super.initState();
-    lullabiesdownloadedlistViewModel.loadDownloadedLullabies();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => lullabiesdownloadedlistViewModel,
       child: Scaffold(
         body: SafeArea(
-          child: BlocBuilder<LullabiesDownloadedListViewModel,
-              LullabiesDownloadedListState>(
+          child: BlocBuilder<AudioViewModel, AudioState>(
             builder: (context, state) {
-              final files = state.downloadedFiles;
+              // final files = state.downloadedFiles;
+              final files = state.downloadedLullabyIds;
 
               return CustomScrollView(
                 slivers: [

@@ -4,19 +4,31 @@ import 'package:kartal/kartal.dart';
 
 final class LullabyCacheModel with CacheModel {
   LullabyCacheModel({
-    this.lullabyId,
-    this.title,
-    this.audioUrl,
+    required this.lullabyId,
+    required this.title,
+    required this.audioUrl,
+    required this.artist,
+    this.coverURL,
+    this.isFavorite,
+    this.isDownloaded,
   });
 
   LullabyCacheModel.empty()
-      : title = '',
+      : lullabyId = 'lullabyId_01',
+        title = '',
         audioUrl = '',
-        lullabyId = '';
+        artist = 'Anonim',
+        coverURL = '',
+        isFavorite = null,
+        isDownloaded = null;
 
-  final String? lullabyId;
-  final String? title;
-  final String? audioUrl;
+  final String lullabyId;
+  final String title;
+  final String audioUrl;
+  final String artist;
+  final String? coverURL;
+  final bool? isFavorite;
+  final bool? isDownloaded;
 
   @override
   LullabyCacheModel fromDynamicJson(dynamic json) {
@@ -29,11 +41,18 @@ final class LullabyCacheModel with CacheModel {
       lullabyId: jsonMap['lullabyId'] as String?,
       title: jsonMap['title'] as String?,
       audioUrl: jsonMap['audioUrl'] as String?,
+      artist: jsonMap['artist'] as String?,
+      coverURL: jsonMap['coverURL'] as String?,
+      isFavorite: jsonMap['isFavorite'] as bool?,
+      isDownloaded: jsonMap['isDownloaded'] as bool?,
     );
   }
 
   @override
-  String get id => lullabyId ?? '';
+  String get id => lullabyId;
+
+  @override
+  String get typeName => 'LullabyCacheModel'; // sabit string
 
   @override
   Map<String, dynamic> toJson() {
@@ -41,6 +60,10 @@ final class LullabyCacheModel with CacheModel {
       'lullabyId': lullabyId,
       'title': title,
       'audioUrl': audioUrl,
+      'artist': artist,
+      'coverURL': coverURL,
+      'isFavorite': isFavorite,
+      'isDownloaded': isDownloaded,
     };
   }
 
@@ -48,11 +71,19 @@ final class LullabyCacheModel with CacheModel {
     String? lullabyId,
     String? title,
     String? audioUrl,
+    String? artist,
+    bool? isFavorite,
+    bool? isDownloaded,
+    String? coverURL,
   }) {
     return LullabyCacheModel(
       lullabyId: lullabyId ?? this.lullabyId,
       title: title ?? this.title,
       audioUrl: audioUrl ?? this.audioUrl,
+      artist: artist ?? this.artist,
+      coverURL: coverURL ?? this.coverURL,
+      isFavorite: isFavorite ?? this.isFavorite,
+      isDownloaded: isDownloaded ?? this.isDownloaded,
     );
   }
 }

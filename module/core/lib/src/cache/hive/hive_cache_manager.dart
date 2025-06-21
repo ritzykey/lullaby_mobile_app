@@ -16,7 +16,8 @@ final class HiveCacheManager extends CacheManager {
     Hive.defaultDirectory = documentPath;
 
     for (final item in items) {
-      Hive.registerAdapter('${item.runtimeType}', item.fromDynamicJson);
+      final typeName = item.typeName;
+      Hive.registerAdapter(typeName, item.fromDynamicJson);
     }
   }
 

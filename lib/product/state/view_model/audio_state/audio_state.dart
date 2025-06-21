@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:x_im_v00r01/feature/lullabyHome/model/lulby_model.dart';
+import 'package:x_im_v00r01/product/cache/model/lullaby_cache_model%20copy.dart';
 
 final class AudioState extends Equatable {
   const AudioState({
@@ -19,7 +20,7 @@ final class AudioState extends Equatable {
 
   final List<LulbyModel> lullaby;
   final List<LulbyModel>? lullabyFavs;
-  final List<String> downloadedLullabyIds;
+  final List<LullabyCacheModel> downloadedLullabyIds;
 
   @override
   List<Object?> get props => [
@@ -39,7 +40,7 @@ final class AudioState extends Equatable {
     Duration? position,
     List<LulbyModel>? lullaby,
     List<LulbyModel>? lullabyFavs,
-    List<String>? downloadedLullabyIds,
+    List<LullabyCacheModel>? downloadedLullabyIds,
   }) {
     return AudioState(
       isLoading: isLoading ?? this.isLoading,

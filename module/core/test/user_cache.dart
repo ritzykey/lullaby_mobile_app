@@ -22,4 +22,8 @@ class UserCache with CacheModel {
       'name': name,
     };
   }
+  
+  @override
+  // TODO: implement typeName
+  String get typeName => throw UnimplementedError();
 }
